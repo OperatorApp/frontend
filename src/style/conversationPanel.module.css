@@ -1,0 +1,32 @@
+
+.panel{
+    display: flex;
+    flex-direction: column;
+    width: 33vw;
+    height: 100vh;
+}
+
+.conversationContent{
+    background: cornflowerblue;
+    display: flex;
+    flex-direction: column;
+    gap: 5vh;
+    padding-top: 3vh;
+    min-height: 4vh;
+    height: 100vh;
+}
+
+.user{
+    display: flex;
+    gap: 4vw;
+    min-height: 3vh;
+    padding: 3vh;
+    border-radius: 10px;
+    background: darkolivegreen;
+    margin: 0 3vw;
+}
+
+.userText{
+    min-height: 3px;
+}
+

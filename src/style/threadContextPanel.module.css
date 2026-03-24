@@ -1,0 +1,127 @@
+
+
+.threadContext{
+    display: flex;
+    width: 67vw;
+    height: 100vh;
+}
+
+.context, .thread{
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.thread{
+    width: 60rem;
+    height: 100vh;
+}
+
+.context{
+    width: 40rem;
+    height: 100vh;
+}
+
+
+
+.contextContent{
+    background: aqua;
+    display: flex;
+    height: 100vh;
+}
+
+.messages{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow: auto;
+    height: 100vh;
+    margin: 1vw 1vh;
+}
+
+.operator, .customer, .aiSuggestion{
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+    text-wrap: wrap;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.operator,  .aiSuggestion{
+    align-self: flex-end;
+
+}
+
+.operator > .trans,  .aiSuggestion > .trans{
+    align-self: flex-end;
+
+}
+
+
+.operator > .org, .customer > .org, .aiSuggestion > .org{
+    border-radius: 2vw;
+    border-style: solid;
+    border-color: darkslategray;
+    border-width: 0.1vw;
+    padding: 1vw 1vh;
+    width: 20vw;
+}
+
+.operator > .trans, .customer > .trans, .aiSuggestion > .trans{
+    font-size: clamp(0.3rem, 0.3rem + 1.5vw, 0.7rem);
+    border-radius: 2vw;
+    border-style: solid;
+    border-color: grey;
+    border-width: 0.1vw;
+    padding: 1vw 1vh;
+    width: 10vw;
+}
+
+
+
+.operator > .org{
+    background: indigo;
+    align-self: flex-end;
+}
+
+.customer > .org{
+    background: mediumseagreen;
+}
+
+.operator > .trans{
+    background: lightslategrey;
+    align-self: flex-end;
+}
+
+.customer > .trans{
+    background: darkslategrey;
+}
+
+
+.messagesDiv{
+    display: flex;
+    margin-bottom: 2vh;
+    margin-left: 2vw;
+    gap: 1vw;
+}
+.messagesDiv > form{
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+input.text{
+    border-style: none;
+    width: 30vw;
+}
+
+
+
+
+
+
+
+
+
+

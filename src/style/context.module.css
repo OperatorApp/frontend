@@ -1,0 +1,180 @@
+/* context.module.css */
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: darkslategray;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 3px solid cornflowerblue;
+    flex-shrink: 0;
+}
+
+.tabBtn {
+    flex: 1;
+    padding: 1.5vh 1vw;
+    background: darkolivegreen;
+    border: none;
+    border-bottom: 4px solid transparent;
+    color: white;
+    cursor: pointer;
+    font-size: clamp(0.5rem, 0.5rem + 0.5vw, 0.85rem);
+    font-weight: 500;
+}
+
+.tabBtn:hover {
+    background: cornflowerblue;
+}
+
+.tabBtnActive {
+    background: indigo;
+    border-bottom: 4px solid aqua;
+}
+
+.content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5vh 1vw;
+}
+
+.tabContent {
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+}
+
+/* ── Sections ───────────────────────────── */
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+    background: lightslategrey;
+    border-radius: 10px;
+    padding: 1.5vh 1vw;
+}
+
+.sectionTitle {
+    font-size: clamp(0.4rem, 0.4rem + 0.4vw, 0.65rem);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: aqua;
+    border-bottom: 2px solid darkslategray;
+    padding-bottom: 0.5vh;
+}
+
+.sectionBody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5vh;
+}
+
+/* ── Rows ───────────────────────────────── */
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1vw;
+    font-size: clamp(0.5rem, 0.5rem + 0.5vw, 0.8rem);
+}
+
+.rowLabel {
+    color: darkslategray;
+}
+
+.rowValue {
+    color: white;
+    text-align: right;
+}
+
+/* ── URL trail ──────────────────────────── */
+
+.urlItem {
+    display: flex;
+    gap: 0.5vw;
+    font-size: clamp(0.4rem, 0.4rem + 0.4vw, 0.7rem);
+}
+
+.urlIndex {
+    color: aqua;
+}
+
+.urlText {
+    color: cornflowerblue;
+    word-break: break-all;
+}
+
+/* ── Cart ───────────────────────────────── */
+
+.cartTotal {
+    border-top: 2px solid darkslategray;
+    padding-top: 0.5vh;
+    margin-top: 0.5vh;
+    font-weight: 700;
+    color: mediumseagreen;
+}
+
+/* ── Orders ─────────────────────────────── */
+
+.orderBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5vh;
+    padding-bottom: 1vh;
+    border-bottom: 2px dashed darkslategray;
+}
+
+.shipment {
+    font-size: clamp(0.4rem, 0.4rem + 0.4vw, 0.65rem);
+    color: cornflowerblue;
+    padding-left: 1vw;
+}
+
+/* ── Action buttons ─────────────────────── */
+
+.actionBtn {
+    width: 100%;
+    text-align: left;
+    padding: 1vh 1vw;
+    font-size: clamp(0.5rem, 0.5rem + 0.5vw, 0.8rem);
+    border-radius: 10px;
+    border: 2px solid darkslategray;
+    background: darkolivegreen;
+    color: white;
+    cursor: pointer;
+}
+
+.actionBtn:hover {
+    background: mediumseagreen;
+    border-color: aqua;
+}
+
+.actionBtnDisabled {
+    color: darkslategray;
+    background: transparent;
+    cursor: not-allowed;
+    border-color: darkslategray;
+}
+
+.actionBtnDisabled:hover {
+    background: transparent;
+    border-color: darkslategray;
+}
+
+/* ── Misc ───────────────────────────────── */
+
+.muted {
+    font-size: clamp(0.4rem, 0.4rem + 0.4vw, 0.7rem);
+    color: cornflowerblue;
+    font-style: italic;
+}
+
+.empty {
+    padding: 1.5vh 1vw;
+    color: cornflowerblue;
+}
