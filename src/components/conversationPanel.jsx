@@ -1,56 +1,44 @@
 import styles from "../style/conversationPanel.module.css"
 import icon from "../assets/icon.png"
-import {useEffect, useState} from "react";
-import {getThreads, changeStatusThread} from "../datacalls/threadcalls.jsx"
+import { useThreads } from "../hooks/useThreads.js"
 
-let Customers = [
-    { id: 1, email: "kaylen.weber@gmail.com", name: "Kaylen", lang: "de" }
-]
+function ConversationPanel({ setSelectedThreadId }) {
+    const { threads, loading, error } = useThreads()
 
+    const handleSelectThread = (threadId) => {
+        setSelectedThreadId(threadId)
+        sessionStorage.setItem("threadId", threadId)
+    }
 
-function ConversationPanel({setCustomerId}){
-    const [customers, setCustomers] = useState(Customers)
+    if (loading) return <div className={styles.panel}>Loading...</div>
+    if (error) return <div className={styles.panel}>Error loading threads</div>
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setCustomers(prev => [
-
-                { id: 2, email: "tristan.moreau@gmail.com", name: "Tristan", lang: "en" },
-                ...prev
-            ])
-        }, 5000)
-
-        return () => clearTimeout(timer)
-    }, [])
-
-
-    return(
+    return (
         <div className={styles.panel}>
             <div className="header">Conversation</div>
             <div className={styles.conversationContent}>
-                {customers.map(user => {
-                    return <User id={user.id} key={user.id} name={user.name} language={user.lang} onclick={setCustomerId}></User>
-                })}
-
+                {threads.map(thread => (
+                    <User
+                        key={thread.id}
+                        threadId={thread.id}
+                        name={thread.customer.name}
+                        onSelect={handleSelectThread}
+                    />
+                ))}
             </div>
         </div>
     )
 }
 
-
-function User({id, name, language, onclick}){
-    let thread = getThreads(id);
-    return(
-            <button style={{fontWeight: thread.status === "NEW" ? "1000" : "inherit", color:  thread.status === "NEW" ? "indianred" :"inherit"}}
-                    onClick={()=>{onclick(id); changeStatusThread(thread)}} className={styles.user}>
-                <img src={icon} alt="winnie the pooh" width={"50px"} height={"50px"}/>
-                <div className={styles.userText}>
-                    <h3>{name}</h3>
-                    <p>{language}</p>
-                </div>
-            </button>
-        )
-
+function User({ threadId, name, onSelect }) {
+    return (
+        <button onClick={() => onSelect(threadId)} className={styles.user}>
+            <img src={icon} alt="user avatar" width={50} height={50} />
+            <div className={styles.userText}>
+                <h3>{name}</h3>
+            </div>
+        </button>
+    )
 }
 
-export {ConversationPanel}
+export { ConversationPanel }

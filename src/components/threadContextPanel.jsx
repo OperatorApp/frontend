@@ -1,87 +1,74 @@
 import styles from "../style/threadContextPanel.module.css"
-import {getThreads, getMessages, addMessage} from "../datacalls/threadcalls.jsx"
-import {useState} from "react";
-import {ContextPanel} from "./context.jsx";
+import { useState } from "react"
+import { ContextPanel } from "./context.jsx"
+import { useThread } from "../hooks/useThread.js"
+import {useScrollBottom} from "../hooks/useScrollBottom.js";
 
-
-
-function ThreadContextPanel({ customerId, playNextMessage, isDone }) {
+function ThreadContextPanel({ selectedThreadId }) {
     return (
         <div className={styles.threadContext}>
-            <Thread
-                customerId={customerId}
-                playNextMessage={playNextMessage}
-                isDone={isDone}
-            />
-            <ContextPanel threadId={getThreads(customerId).id} />
+            <Thread threadId={selectedThreadId} />
+            <ContextPanel threadId={selectedThreadId} />
         </div>
     )
 }
 
-function Thread({ customerId, playNextMessage, isDone }) {
+function Thread({ threadId }) {
     const [text, setText] = useState("")
-    if (!customerId) return <div>Select a user</div>
+    const { thread, loading, error, send } = useThread(threadId)
+    const scrollRef = useScrollBottom(thread?.messages)
 
-    let thread = getThreads(customerId)
-    let messages = getMessages(thread.id)
-
-    function handleSend() {
-        if (!text.trim()) return
-        addMessage(thread.id, text)
+    const handleSend = () => {
+        send(text)
         setText("")
     }
+
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") handleSend()
+    }
+
+    if (loading) return (<div className={styles.thread}>Loading...</div>)
+    if (error) return <div className={styles.thread}>Error loading thread</div>
+    if (!thread) return <div className={styles.thread}>Select a user</div>
 
     return (
         <div className={styles.thread}>
             <div className="header">Thread</div>
-            <div className={styles.messages}>
-                {messages.map(message => {
-                    if (message.sender === "operator") {
-                        return <div className={styles.operator} key={message.id}>
-                            <div className={styles.org}>{message.text_original}</div>
-                            <div className={styles.trans}>{message.text_translated}</div>
-                        </div>
-                    }
-                    if (message.sender === "customer") {
-                        return <div className={styles.customer} key={message.id}>
-                            <div className={styles.org}>{message.text_original}</div>
-                            <div className={styles.trans}>{message.text_translated}</div>
-                        </div>
-                    }
-                    if (message.sender === "ai_suggestion") {
-                        return <div className={styles.aiSuggestion} key={message.id}>
-                            <div className={styles.org}>{message.text_original}</div>
-                            <div className={styles.trans}>{message.text_translated}</div>
-                        </div>
-                    }
-                })}
+            <div className={styles.messages} ref={scrollRef}>
+                {thread.messages.map(message => (
+                    <Message key={message.id} message={message} />
+                ))}
             </div>
-
             <div className={styles.messagesDiv}>
                 <input
                     className={styles.text}
                     type="text"
                     value={text}
                     onChange={e => setText(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Type a message..."
                 />
                 <button onClick={handleSend}>Send</button>
-                {/* ── scenario player ── */}
-                <button onClick={playNextMessage} disabled={isDone}>
-                    {isDone ? "✓ Done" : "▶ Next"}
-                </button>
             </div>
         </div>
     )
 }
 
+function Message({ message }) {
+    const senderStyles = {
+        OPERATOR: styles.operator,
+        CUSTOMER: styles.customer,
+        AI_SUGGESTION: styles.aiSuggestion,
+    }
 
-function Context() {
-    return <div className={styles.context}>
-        <div className="header">Context</div>
-        <div className={styles.contextContent}></div>
-    </div>
+    const className = senderStyles[message.sender] || styles.customer
+
+    return (
+        <div className={className}>
+            <div className={styles.org}>{message.text_original}</div>
+            <div className={styles.trans}>{message.text_translated}</div>
+        </div>
+    )
 }
 
-
-export {ThreadContextPanel}
-
+export { ThreadContextPanel }

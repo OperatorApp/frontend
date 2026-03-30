@@ -1,6 +1,6 @@
 // ContextPanel.jsx
 import { useState, useEffect } from "react"
-import { getContext } from "../datacalls/threadcalls.jsx"
+import { getContext } from "../service/threadcalls.jsx"
 import styles from "../style/context.module.css"
 
 function ContextPanel({ threadId }) {
