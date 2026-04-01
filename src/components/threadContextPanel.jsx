@@ -5,21 +5,26 @@ import { useThread } from "../hooks/useThread.js"
 import {useScrollBottom} from "../hooks/useScrollBottom.js";
 
 function ThreadContextPanel({ selectedThreadId }) {
+    const { thread, loading, error, send } = useThread(selectedThreadId)
+
     return (
         <div className={styles.threadContext}>
-            <Thread threadId={selectedThreadId} />
-            <ContextPanel threadId={selectedThreadId} />
+            <Thread thread={thread} loading={loading} error={error} send={send} selectedThreadId={selectedThreadId} />
+            <ContextPanel snapshot={thread?.snapshot} />
         </div>
     )
 }
 
-function Thread({ threadId }) {
+function Thread({ thread, loading, error, send, selectedThreadId }) {
     const [text, setText] = useState("")
-    const { thread, loading, error, send } = useThread(threadId)
     const scrollRef = useScrollBottom(thread?.messages)
 
     const handleSend = () => {
-        send(text)
+        if (!selectedThreadId) {
+            console.error("No thread selected")
+            return
+        }
+        send(text, selectedThreadId)
         setText("")
     }
 
@@ -35,9 +40,13 @@ function Thread({ threadId }) {
         <div className={styles.thread}>
             <div className="header">Thread</div>
             <div className={styles.messages} ref={scrollRef}>
-                {thread.messages.map(message => (
-                    <Message key={message.id} message={message} />
-                ))}
+                {thread.messages && thread.messages.length > 0 ? (
+                    thread.messages.map(message => (
+                        <Message key={message.id} message={message} />
+                    ))
+                ) : (
+                    <div style={{ padding: "20px", color: "#999" }}>No messages yet</div>
+                )}
             </div>
             <div className={styles.messagesDiv}>
                 <input

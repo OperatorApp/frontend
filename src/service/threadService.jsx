@@ -60,10 +60,27 @@ async function getThreadById(id) {
         return data.data
 }
 
-export { getMessagesFromThread, getThreads, getThreadById }
+async function patchThreadStatusOPEN(id){
+    if (!id) {
+        throw new Error("Thread ID is required")
+    }
 
+    const response = await fetch(`${BASE_URL}/thread/${id}/status`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            status: "OPEN"
+        })
+    })
 
+    if (!response.ok) {
+        throw new Error(`Failed to update thread status: ${response.status}`)
+    }
+}
 
+export { getMessagesFromThread, getThreads, getThreadById, patchThreadStatusOPEN }
 
 
 

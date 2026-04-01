@@ -4,30 +4,62 @@
     flex-direction: column;
     width: 33vw;
     height: 100vh;
+    overflow: hidden;
 }
 
 .conversationContent{
     background: cornflowerblue;
     display: flex;
     flex-direction: column;
-    gap: 5vh;
-    padding-top: 3vh;
-    min-height: 4vh;
+    gap: 1rem;
+    padding: 1rem;
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .user{
     display: flex;
-    gap: 4vw;
-    min-height: 3vh;
-    padding: 3vh;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
     border-radius: 10px;
     background: darkolivegreen;
-    margin: 0 3vw;
+    cursor: pointer;
+    border: none;
+    text-align: left;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.userPending{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    background: lightcoral;
+    cursor: pointer;
+    border: none;
+    text-align: left;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.user:hover, .userPending:hover{
+    opacity: 0.9;
 }
 
 .userText{
-    min-height: 3px;
+    flex: 1;
+    overflow: hidden;
+}
+
+.userText h3{
+    margin: 0;
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 

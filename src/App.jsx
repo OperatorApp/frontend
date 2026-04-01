@@ -12,7 +12,7 @@ function App() {
 
     return (
         <MessageProvider>
-            <ConversationPanel setSelectedThreadId={setSelectedThreadId} />
+            <ConversationPanel setSelectedThreadId={setSelectedThreadId} selectedThreadId={selectedThreadId} />
             <ThreadContextPanel selectedThreadId={selectedThreadId} />
         </MessageProvider>
     )

@@ -1,18 +1,11 @@
-// ContextPanel.jsx
-import { useState, useEffect } from "react"
-import { getContext } from "../service/threadcalls.jsx"
+import { useState } from "react"
 import styles from "../style/context.module.css"
 
-function ContextPanel({ threadId }) {
-    const [context, setContext] = useState(null)
+function ContextPanel({ snapshot }) {
     const [tab, setTab] = useState("context")
 
-    useEffect(() => {
-        const data = getContext(threadId)
-        if (data) setContext(data)
-    }, [threadId])
 
-    if (!context) return <div className={styles.empty}>No context found</div>
+    if (!snapshot) return (<div className={styles.empty}>No context found</div>)
 
     return (
         <div className={styles.panel}>
@@ -21,79 +14,92 @@ function ContextPanel({ threadId }) {
                 <TabBtn label="Quick Actions" active={tab === "actions"} onClick={() => setTab("actions")} />
             </div>
             <div className={styles.content}>
-                {tab === "context" ? <ContextTab context={context} /> : <ActionsTab context={context} />}
+                {tab === "context" ? <ContextTab context={snapshot} /> : <ActionsTab context={snapshot} />}
             </div>
         </div>
     )
 }
 
 function ContextTab({ context }) {
-    const { customer, session, orders } = context
+    const { customer, country, city, local_time, url_trail, cart_snapshot, sentiment_label, sentiment_conf, orders } = context || {}
 
     return (
         <div className={styles.tabContent}>
 
-            <Section title="Customer">
-                <Row label="Name"  value={customer.name} />
-                <Row label="Email" value={customer.email} />
-                <Row label="Lang"  value={customer.lang.toUpperCase()} />
-            </Section>
+            {customer && (
+                <Section title="Customer">
+                    {customer.name && <Row label="Name" value={customer.name} />}
+                    {customer.email && <Row label="Email" value={customer.email} />}
+                    {customer.lang && <Row label="Lang" value={customer.lang.toUpperCase()} />}
+                </Section>
+            )}
 
-            <Section title="Session">
-                <Row label="Location"   value={`${session.city}, ${session.country}`} />
-                <Row label="Local time" value={session.local_time} />
-                <Row label="Currency"   value={session.cart_snapshot.currency} />
-                <Row label="Sentiment"  value={`${session.sentiment_label} (${Math.round(session.sentiment_conf * 100)}%)`} />
-            </Section>
+            {(country || city || local_time || cart_snapshot?.currency || sentiment_label) && (
+                <Section title="Session">
+                    {(city || country) && (
+                        <Row label="Location" value={[city, country].filter(Boolean).join(", ")} />
+                    )}
+                    {local_time && <Row label="Local time" value={local_time} />}
+                    {cart_snapshot?.currency && <Row label="Currency" value={cart_snapshot.currency} />}
+                    {sentiment_label && (
+                        <Row label="Sentiment" value={`${sentiment_label}${sentiment_conf ? ` (${Math.round(sentiment_conf * 100)}%)` : ""}`} />
+                    )}
+                </Section>
+            )}
 
-            <Section title="URL Trail">
-                {session.url_trail.map((url, i) => (
-                    <div key={i} className={styles.urlItem}>
-                        <span className={styles.urlIndex}>{i + 1}</span>
-                        <span className={styles.urlText}>{url}</span>
-                    </div>
-                ))}
-            </Section>
-
-            <Section title="Cart">
-                {session.cart_snapshot.items.length === 0
-                    ? <span className={styles.muted}>Empty</span>
-                    : <>
-                        {session.cart_snapshot.items.map((item, i) => (
-                            <Row key={i} label={item.name}
-                                 value={`${session.cart_snapshot.currency} ${item.price.toFixed(2)}`} />
-                        ))}
-                        <div className={styles.cartTotal}>
-                            <Row label="Total"
-                                 value={`${session.cart_snapshot.currency} ${session.cart_snapshot.total.toFixed(2)}`} />
+            {url_trail?.length > 0 && (
+                <Section title="URL Trail">
+                    {url_trail.map((url, i) => (
+                        <div key={i} className={styles.urlItem}>
+                            <span className={styles.urlIndex}>{i + 1}</span>
+                            <span className={styles.urlText}>{url}</span>
                         </div>
-                    </>
-                }
-            </Section>
+                    ))}
+                </Section>
+            )}
 
-            <Section title="Orders">
-                {orders.length === 0
-                    ? <span className={styles.muted}>No orders</span>
-                    : orders.map(order => (
+            {cart_snapshot && (
+                <Section title="Cart">
+                    {!cart_snapshot.items?.length
+                        ? <span className={styles.muted}>Empty</span>
+                        : <>
+                            {cart_snapshot.items.map((item, i) => (
+                                <Row key={i} label={item.name}
+                                     value={`${cart_snapshot.currency || ""} ${item.price?.toFixed(2) || ""}`} />
+                            ))}
+                            {cart_snapshot.total != null && (
+                                <div className={styles.cartTotal}>
+                                    <Row label="Total"
+                                         value={`${cart_snapshot.currency || ""} ${cart_snapshot.total.toFixed(2)}`} />
+                                </div>
+                            )}
+                        </>
+                    }
+                </Section>
+            )}
+
+            {orders?.length > 0 && (
+                <Section title="Orders">
+                    {orders.map(order => (
                         <div key={order.id} className={styles.orderBlock}>
                             <Row label={order.id} value={order.status} />
-                            {order.shipments.map((shp, i) => (
+                            {order.shipments?.map((shp, i) => (
                                 <div key={i} className={styles.shipment}>
-                                    {shp.carrier} · {shp.tracking_no} · {shp.last_status}
+                                    {[shp.carrier, shp.tracking_no, shp.last_status].filter(Boolean).join(" · ")}
                                 </div>
                             ))}
                         </div>
-                    ))
-                }
-            </Section>
+                    ))}
+                </Section>
+            )}
 
         </div>
     )
 }
 
 function ActionsTab({ context }) {
-    const { session, orders } = context
-    const hasOrder = orders.length > 0
+    const { country, orders } = context || {}
+    const hasOrder = orders?.length > 0
 
     return (
         <div className={styles.tabContent}>
@@ -104,10 +110,12 @@ function ActionsTab({ context }) {
                 <ActionBtn label="Send tracking link" disabled={!hasOrder} />
             </Section>
 
-            <Section title="Shipping">
-                <ActionBtn label="Get shipping quote" />
-                <ActionBtn label={`Shipping to ${session.country}`} />
-            </Section>
+            {country && (
+                <Section title="Shipping">
+                    <ActionBtn label="Get shipping quote" />
+                    <ActionBtn label={`Shipping to ${country}`} />
+                </Section>
+            )}
 
             <Section title="Payment">
                 <ActionBtn label="Send PayPal request" />
