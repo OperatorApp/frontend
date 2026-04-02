@@ -1,6 +1,34 @@
 import { useState } from "react"
 import styles from "../style/context.module.css"
 
+function formatDisplayValue(value) {
+    if (value == null) return ""
+    if (typeof value === "string" || typeof value === "number") return String(value)
+    if (typeof value === "boolean") return value ? "Yes" : "No"
+    if (typeof value === "object") {
+        if (typeof value.url === "string") return value.url
+        if (typeof value.ts === "string" || typeof value.ts === "number") return String(value.ts)
+        return JSON.stringify(value)
+    }
+
+    return String(value)
+}
+
+function formatUrlTrailEntry(entry) {
+    if (typeof entry === "string") {
+        return { text: entry, timestamp: null }
+    }
+
+    if (entry && typeof entry === "object") {
+        return {
+            text: formatDisplayValue(entry.url) || formatDisplayValue(entry),
+            timestamp: entry.ts ? formatDisplayValue(entry.ts) : null,
+        }
+    }
+
+    return { text: formatDisplayValue(entry), timestamp: null }
+}
+
 function ContextPanel({ snapshot }) {
     const [tab, setTab] = useState("context")
 
@@ -49,12 +77,17 @@ function ContextTab({ context }) {
 
             {url_trail?.length > 0 && (
                 <Section title="URL Trail">
-                    {url_trail.map((url, i) => (
+                    {url_trail.map((entry, i) => {
+                        const { text, timestamp } = formatUrlTrailEntry(entry)
+
+                        return (
                         <div key={i} className={styles.urlItem}>
                             <span className={styles.urlIndex}>{i + 1}</span>
-                            <span className={styles.urlText}>{url}</span>
+                            <span className={styles.urlText}>{text}</span>
+                            {timestamp && <span className={styles.urlTimestamp}>{timestamp}</span>}
                         </div>
-                    ))}
+                        )
+                    })}
                 </Section>
             )}
 
@@ -145,8 +178,8 @@ function Section({ title, children }) {
 function Row({ label, value }) {
     return (
         <div className={styles.row}>
-            <span className={styles.rowLabel}>{label}</span>
-            <span className={styles.rowValue}>{value}</span>
+            <span className={styles.rowLabel}>{formatDisplayValue(label)}</span>
+            <span className={styles.rowValue}>{formatDisplayValue(value)}</span>
         </div>
     )
 }

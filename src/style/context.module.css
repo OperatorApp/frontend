@@ -109,6 +109,12 @@
     word-break: break-all;
 }
 
+.urlTimestamp {
+    color: white;
+    margin-left: auto;
+    opacity: 0.75;
+}
+
 /* ── Cart ───────────────────────────────── */
 
 .cartTotal {
