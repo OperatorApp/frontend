@@ -1,3 +1,4 @@
+import { authService } from './authService'
 
 const BASE_URL = import.meta.env.VITE_API_URL
 
@@ -37,7 +38,12 @@ async function getMessagesFromThread(username) {
 
 
 async function getThreads(){
-    const response = await fetch(`${BASE_URL}/thread`)
+    const token = authService.getToken()
+    const response = await fetch(`${BASE_URL}/thread`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
     if(!response.ok){
         throw new Error(`Failed to fetch threads: ${response.status}`)
     }
@@ -49,8 +55,13 @@ async function getThreadById(id) {
     if (!id) {
         throw new Error("Thread ID is required")
     }
+    const token = authService.getToken()
 
-    const response = await fetch(`${BASE_URL}/thread/${id}`)
+    const response = await fetch(`${BASE_URL}/thread/${id}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
     if (!response.ok) {
         throw new Error(`Failed to fetch thread: ${response.status}`)
     }
@@ -64,11 +75,13 @@ async function patchThreadStatusOPEN(id){
     if (!id) {
         throw new Error("Thread ID is required")
     }
+    const token = authService.getToken()
 
     const response = await fetch(`${BASE_URL}/thread/${id}/status`, {
         method: "PATCH",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
             status: "OPEN"

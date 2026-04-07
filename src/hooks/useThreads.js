@@ -3,14 +3,17 @@ import { getThreads } from "../service/threadService.jsx"
 import { socket } from "../context/context.jsx"
 
 function markThreadPending(threads, threadId, selectedThreadId) {
-    return threads.map(thread => {
-        if (thread.id === threadId && threadId !== selectedThreadId) {
-            return { ...thread, status: "PENDING" }
-        }
+    const thread = threads.find(t => t.id === threadId)
+    if (!thread) return threads
 
-        return thread
-    })
+    const updated = threadId !== selectedThreadId
+        ? { ...thread, status: "PENDING" }
+        : thread
+
+    const rest = threads.filter(t => t.id !== threadId)
+    return [updated, ...rest]
 }
+
 
 async function loadThreads(setThreads, setError, setLoading) {
     try {

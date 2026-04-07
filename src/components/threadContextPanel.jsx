@@ -3,6 +3,7 @@ import { useState } from "react"
 import { ContextPanel } from "./context.jsx"
 import { useThread } from "../hooks/useThread.js"
 import {useScrollBottom} from "../hooks/useScrollBottom.js";
+import {useAiSuggestion} from "../hooks/useAiSugesstion.js";
 
 function ThreadContextPanel({ selectedThreadId }) {
     const { thread, loading, error, send } = useThread(selectedThreadId)
@@ -18,21 +19,30 @@ function ThreadContextPanel({ selectedThreadId }) {
 function Thread({ thread, loading, error, send, selectedThreadId }) {
     const [text, setText] = useState("")
     const scrollRef = useScrollBottom(thread?.messages)
+    const { suggestion, loading: aiLoading, suggest, clear } = useAiSuggestion()
 
     const handleSend = () => {
-        if (!selectedThreadId) {
-            console.error("No thread selected")
-            return
-        }
+        if (!selectedThreadId) return
         send(text, selectedThreadId)
         setText("")
+        clear()
     }
 
     const handleKeyDown = (e) => {
         if (e.key === "Enter") handleSend()
     }
 
-    if (loading) return (<div className={styles.thread}>Loading...</div>)
+    const handleSuggest = () => {
+        if (!thread?.messages?.length) return
+        suggest(thread.messages, selectedThreadId)
+    }
+
+    const handleUseSuggestion = () => {
+        setText(suggestion)
+        clear()
+    }
+
+    if (loading) return <div className={styles.thread}>Loading...</div>
     if (error) return <div className={styles.thread}>Error loading thread</div>
     if (!thread) return <div className={styles.thread}>Select a user</div>
 
@@ -48,6 +58,15 @@ function Thread({ thread, loading, error, send, selectedThreadId }) {
                     <div style={{ padding: "20px", color: "#999" }}>No messages yet</div>
                 )}
             </div>
+
+            {suggestion && (
+                <div className={styles.suggestion}>
+                    <span>{suggestion}</span>
+                    <button onClick={handleUseSuggestion}>Use</button>
+                    <button onClick={clear}>Dismiss</button>
+                </div>
+            )}
+
             <div className={styles.messagesDiv}>
                 <input
                     className={styles.text}
@@ -58,6 +77,9 @@ function Thread({ thread, loading, error, send, selectedThreadId }) {
                     placeholder="Type a message..."
                 />
                 <button onClick={handleSend}>Send</button>
+                <button onClick={handleSuggest} disabled={aiLoading}>
+                    {aiLoading ? "..." : "AI"}
+                </button>
             </div>
         </div>
     )

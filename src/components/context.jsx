@@ -10,7 +10,6 @@ function formatDisplayValue(value) {
         if (typeof value.ts === "string" || typeof value.ts === "number") return String(value.ts)
         return JSON.stringify(value)
     }
-
     return String(value)
 }
 
