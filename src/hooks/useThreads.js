@@ -6,10 +6,11 @@ function markThreadPending(threads, threadId, selectedThreadId) {
     const thread = threads.find(t => t.id === threadId)
     if (!thread) return threads
 
-    const updated = threadId !== selectedThreadId
-        ? { ...thread, status: "PENDING" }
-        : thread
-
+    const updated = {
+        ...thread,
+        last_message_at: new Date().toISOString(),
+        status: threadId !== selectedThreadId ? "PENDING" : thread.status
+    }
     const rest = threads.filter(t => t.id !== threadId)
     return [updated, ...rest]
 }
