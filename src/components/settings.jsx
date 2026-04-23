@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { authService } from "../service/authService.js";
+import {PromptButtons} from "./PromptButtons.jsx";
 
 function Settings() {
     const navigate = useNavigate();
@@ -67,6 +68,8 @@ function Settings() {
                     </p>
                 )}
             </div>
+
+            <PromptButtons />
 
             <div className="settings-section">
                 <h3>Account</h3>

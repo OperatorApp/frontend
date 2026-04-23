@@ -1,6 +1,12 @@
-import {socket} from "../context/context.jsx"
+import {getSocket} from "../context/context.jsx"
 
 function sendMessage(text, threadId) {
+    const socket = getSocket()
+    if (!socket?.connected) {
+        console.error("Socket not connected")
+        return
+    }
+
     const id = threadId || Number(sessionStorage.getItem("threadId"))
 
     if (!id || id === 0) {
@@ -18,8 +24,18 @@ function sendMessage(text, threadId) {
     socket.emit("send_message", messageData)
 }
 
+function subscribeToMessages(callback) {
+    const socket = getSocket()
+    if (!socket) {
+        console.error("Socket not available")
+        return () => {}
+    }
 
-export {sendMessage}
+    socket.on("new_message", callback)
+    return () => socket.off("new_message", callback)
+}
+
+export {sendMessage, subscribeToMessages}
 
 
 

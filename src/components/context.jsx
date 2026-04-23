@@ -1,5 +1,7 @@
 import { useState } from "react"
 import styles from "../style/context.module.css"
+import {usePromptButtons} from "../hooks/useAiPromptButtons.js";
+import {firePromptButton} from "../service/aiPromptButtonsService.js";
 
 function formatDisplayValue(value) {
     if (value == null) return ""
@@ -28,7 +30,7 @@ function formatUrlTrailEntry(entry) {
     return { text: formatDisplayValue(entry), timestamp: null }
 }
 
-function ContextPanel({ snapshot }) {
+function ContextPanel({ snapshot, threadId, onResponse }) {
     const [tab, setTab] = useState("context")
 
 
@@ -41,7 +43,7 @@ function ContextPanel({ snapshot }) {
                 <TabBtn label="Quick Actions" active={tab === "actions"} onClick={() => setTab("actions")} />
             </div>
             <div className={styles.content}>
-                {tab === "context" ? <ContextTab context={snapshot} /> : <ActionsTab context={snapshot} />}
+                {tab === "context" ? <ContextTab context={snapshot} /> : <ActionsTab context={snapshot} threadId={threadId} onResponse={onResponse}/>}
             </div>
         </div>
     )
@@ -129,37 +131,40 @@ function ContextTab({ context }) {
     )
 }
 
-function ActionsTab({ context }) {
+function ActionsTab({ context, threadId, onResponse }) {
     const { country, orders } = context || {}
     const hasOrder = orders?.length > 0
+    const { buttons, loading } = usePromptButtons()
+    const [firingId, setFiringId] = useState(null)
+
+    const handlePromptButton = async (btn) => {
+        setFiringId(btn.id)
+        try {
+            console.log("threadId in ActionsTab:", threadId)
+            const result = await firePromptButton(btn.id, threadId)
+            onResponse?.(result.response, result.thread_id)
+        } catch (err) {
+            console.error("Prompt button error:", err)
+        } finally {
+            setFiringId(null)
+        }
+    }
 
     return (
         <div className={styles.tabContent}>
 
-            <Section title="Communication">
-                <ActionBtn label="Request email" />
-                <ActionBtn label="Request photo" />
-                <ActionBtn label="Send tracking link" disabled={!hasOrder} />
-            </Section>
-
-            {country && (
-                <Section title="Shipping">
-                    <ActionBtn label="Get shipping quote" />
-                    <ActionBtn label={`Shipping to ${country}`} />
+            {!loading && buttons.length > 0 && (
+                <Section title="Prompt Buttons">
+                    {buttons.map(btn => (
+                        <ActionBtn
+                            key={btn.id}
+                            label={firingId === btn.id ? "..." : btn.name}
+                            disabled={firingId !== null}
+                            onClick={() => handlePromptButton(btn)}
+                        />
+                    ))}
                 </Section>
             )}
-
-            <Section title="Payment">
-                <ActionBtn label="Send PayPal request" />
-                <ActionBtn label="Apply discount" />
-                <ActionBtn label="Issue refund" disabled={!hasOrder} />
-            </Section>
-
-            <Section title="Support">
-                <ActionBtn label="Check return policy" />
-                <ActionBtn label="Start return flow" disabled={!hasOrder} />
-                <ActionBtn label="Search docs" />
-            </Section>
 
         </div>
     )
@@ -183,9 +188,13 @@ function Row({ label, value }) {
     )
 }
 
-function ActionBtn({ label, disabled = false }) {
+function ActionBtn({ label, disabled = false, onClick }) {
     return (
-        <button className={`${styles.actionBtn} ${disabled ? styles.actionBtnDisabled : ""}`} disabled={disabled}>
+        <button
+            className={`${styles.actionBtn} ${disabled ? styles.actionBtnDisabled : ""}`}
+            disabled={disabled}
+            onClick={onClick}
+        >
             {label}
         </button>
     )

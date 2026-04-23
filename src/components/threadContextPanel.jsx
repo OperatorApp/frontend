@@ -7,17 +7,26 @@ import {useAiSuggestion} from "../hooks/useAiSugesstion.js";
 
 function ThreadContextPanel({ selectedThreadId }) {
     const { thread, loading, error, send } = useThread(selectedThreadId)
+    const [text, setText] = useState("")
 
     return (
         <div className={styles.threadContext}>
-            <Thread thread={thread} loading={loading} error={error} send={send} selectedThreadId={selectedThreadId} />
-            <ContextPanel snapshot={thread?.snapshot} />
+            <Thread
+                thread={thread}
+                loading={loading}
+                error={error}
+                send={send}
+                selectedThreadId={selectedThreadId}
+                text={text}
+                setText={setText}
+            />
+            <ContextPanel snapshot={thread?.snapshot} threadId={selectedThreadId}
+                          onResponse={(response) => setText(response)} />
         </div>
     )
 }
 
-function Thread({ thread, loading, error, send, selectedThreadId }) {
-    const [text, setText] = useState("")
+function Thread({ thread, loading, error, send, selectedThreadId, text, setText  }) {
     const scrollRef = useScrollBottom(thread?.messages)
     const { suggestion, loading: aiLoading, suggest, clear } = useAiSuggestion()
 

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { authService } from '../service/authService'
+import { connectSocket, disconnectSocket } from './context'
 
 const AuthContext = createContext(null)
 
@@ -15,6 +16,7 @@ export const AuthProvider = ({ children }) => {
         if (storedToken && storedUser) {
             setToken(storedToken)
             setUser(storedUser)
+            connectSocket()
         }
         setLoading(false)
     }, [])
@@ -28,6 +30,7 @@ export const AuthProvider = ({ children }) => {
 
         setToken(token)
         setUser(operator)
+        connectSocket()
     }
 
     const register = async (username, email, password, name, languages) => {
@@ -39,9 +42,11 @@ export const AuthProvider = ({ children }) => {
 
         setToken(token)
         setUser(operator)
+        connectSocket()
     }
 
     const logout = () => {
+        disconnectSocket()
         authService.removeToken()
         authService.removeUser()
         setToken(null)
