@@ -1,5 +1,4 @@
 
-
 import { io } from "socket.io-client"
 import {authService} from "../service/authService.js";
 
@@ -20,7 +19,7 @@ export function connectSocket() {
         return null
     }
 
-    socket = io("http://localhost:3001/", {
+    socket = io(import.meta.env.VITE_API_URL, {
         reconnectionDelayMax: 10000,
         auth: { token },
     })
