@@ -16,9 +16,9 @@ function markThreadPending(threads, threadId, selectedThreadId, lastMessage = nu
     return [updated, ...rest]
 }
 
-async function loadThreads(setThreads, setError, setLoading) {
+async function loadThreads(setThreads, setError, setLoading, filters = {}) {
     try {
-        const data = await getThreads()
+        const data = await getThreads(filters)
         setThreads(data)
     } catch (err) {
         setError(err)
@@ -56,12 +56,21 @@ function subscribeToOperatorThreads() {
     return () => socket.emit("leave_operator_threads")
 }
 
-export function useThreads(selectedThreadId) {
+export function useThreads(selectedThreadId, filters = {}) {
     const [threads, setThreads] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const [debouncedFilters, setDebouncedFilters] = useState(filters)
 
-    useEffect(() => { loadThreads(setThreads, setError, setLoading) }, [])
+    useEffect(() => {
+        const timeout = setTimeout(() => setDebouncedFilters(filters), 400)
+        return () => clearTimeout(timeout)
+    }, [filters.name, filters.hasMessages, filters.pendingOnly])
+
+    useEffect(() => {
+        loadThreads(setThreads, setError, setLoading, debouncedFilters)
+    }, [debouncedFilters])
+
     useEffect(() => subscribeToOperatorThreads(), [])
     useEffect(() => subscribeToThreadUpdates(selectedThreadId, setThreads), [selectedThreadId])
 

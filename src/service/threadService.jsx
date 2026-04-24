@@ -36,20 +36,23 @@ async function getMessagesFromThread(username) {
     return { thread, messages: messagesData.data || [] }
 }
 
-
-async function getThreads(){
+async function getThreads(filters = {}) {
     const token = authService.getToken()
-    const response = await fetch(`${BASE_URL}/thread`, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
+
+    const params = new URLSearchParams()
+    if (filters.name)                       params.set("name", filters.name)
+    if (filters.pendingOnly)                params.set("pendingOnly", "true")
+    if (filters.hasMessages !== undefined)  params.set("hasMessages", String(filters.hasMessages))
+
+    const response = await fetch(`${BASE_URL}/thread?${params.toString()}`, {
+        headers: { Authorization: `Bearer ${token}` }
     })
-    if(!response.ok){
-        throw new Error(`Failed to fetch threads: ${response.status}`)
-    }
+
+    if (!response.ok) throw new Error(`Failed to fetch threads: ${response.status}`)
     const data = await response.json()
     return data.data || []
 }
+
 
 async function getThreadById(id) {
     if (!id) {
