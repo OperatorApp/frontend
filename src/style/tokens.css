@@ -1,0 +1,122 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+    --palette-charcoal:  #264653;
+    --palette-verdigris: #2a9d8f;
+    --palette-jasmine:   #e9c46a;
+    --palette-sand:      #f4a261;
+    --palette-peach:     #e76f51;
+
+    --font-display: 'Fraunces', 'Georgia', serif;
+    --font-body:    'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+
+    --text-xs:   0.75rem;
+    --text-sm:   0.8125rem;
+    --text-base: 0.9375rem;
+    --text-md:   1rem;
+    --text-lg:   1.125rem;
+    --text-xl:   1.375rem;
+    --text-2xl:  1.75rem;
+
+    --leading-tight:  1.25;
+    --leading-normal: 1.5;
+
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-7: 2rem;
+    --space-8: 3rem;
+
+    --radius-sm:   6px;
+    --radius-md:   10px;
+    --radius-lg:   14px;
+    --radius-xl:   20px;
+    --radius-full: 9999px;
+
+    --transition-fast: 120ms ease;
+    --transition:      180ms ease;
+
+    --bg:            #fbf8f3;  /* warm cream page bg */
+    --surface:       #ffffff;  /* cards / panels */
+    --surface-2:     #f4efe7;  /* subtle alt surface */
+    --surface-3:     #ebe4d4;  /* dividers, chip bg */
+    --border:        #e5ddd0;
+    --border-strong: #d3c9b8;
+
+    --text:          #264653;  /* charcoal */
+    --text-muted:    #6a7b82;
+    --text-subtle:   #94a3aa;
+    --text-on-accent: #ffffff;
+
+    --accent:        #2a9d8f;  /* verdigris */
+    --accent-hover:  #238579;
+    --accent-soft:   #d4ede9;  /* pale verdigris */
+
+    --highlight:     #e9c46a;  /* jasmine */
+    --highlight-soft:#fbf0cf;
+
+    --warn:          #d97a3d;  /* deeper sand for text on light */
+    --warn-bg:       #fde6d0;  /* pending bg */
+    --warn-border:   #f4a261;
+
+    --danger:        #c5533b;  /* deeper peach for text on light */
+    --danger-bg:     #fbdfd5;
+    --danger-border: #e76f51;
+
+    --bubble-me:         #2a9d8f;   /* operator/AI — verdigris */
+    --bubble-me-text:    #ffffff;
+    --bubble-them:       #f4efe7;   /* customer — warm cream */
+    --bubble-them-text:  #264653;
+
+    --shadow-sm: 0 1px 2px rgba(38, 70, 83, 0.06);
+    --shadow-md: 0 2px 8px rgba(38, 70, 83, 0.08);
+    --shadow-lg: 0 10px 30px rgba(38, 70, 83, 0.12);
+
+    --ring: 0 0 0 3px rgba(42, 157, 143, 0.35);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg:            #172a33;
+        --surface:       #20404c;
+        --surface-2:     #274c5a;
+        --surface-3:     #2f5767;
+        --border:        #365e6e;
+        --border-strong: #457386;
+
+        --text:           #f4efe7;
+        --text-muted:     #a8bcc3;
+        --text-subtle:    #7d949d;
+        --text-on-accent: #0f2026;
+
+        --accent:        #3fb5a6;
+        --accent-hover:  #55c9bb;
+        --accent-soft:   rgba(63, 181, 166, 0.18);
+
+        --highlight:     #eccf78;
+        --highlight-soft:rgba(233, 196, 106, 0.15);
+
+        --warn:          #f4a261;
+        --warn-bg:       rgba(244, 162, 97, 0.18);
+        --warn-border:   #f4a261;
+
+        --danger:        #ef8a70;
+        --danger-bg:     rgba(231, 111, 81, 0.18);
+        --danger-border: #e76f51;
+
+        --bubble-me:         #2a9d8f;
+        --bubble-me-text:    #ffffff;
+        --bubble-them:       #2f5767;
+        --bubble-them-text:  #f4efe7;
+
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+        --shadow-md: 0 2px 10px rgba(0, 0, 0, 0.35);
+        --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.45);
+
+        --ring: 0 0 0 3px rgba(63, 181, 166, 0.4);
+    }
+}

@@ -1,0 +1,132 @@
+/* =========================================================
+   auth.module.css — LoginForm + RegisterForm
+   ========================================================= */
+
+.page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6);
+    background: var(--bg);
+    background-image:
+            radial-gradient(circle at 20% 10%, var(--accent-soft) 0%, transparent 40%),
+            radial-gradient(circle at 80% 90%, var(--highlight-soft) 0%, transparent 40%);
+}
+
+.form {
+    width: 100%;
+    max-width: 24rem;
+    padding: var(--space-7);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: var(--space-2);
+    letter-spacing: -0.02em;
+}
+
+.group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.label {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.input {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-base);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text);
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.input::placeholder {
+    color: var(--text-subtle);
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: var(--surface);
+}
+
+.input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.error {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--danger);
+    background: var(--danger-bg);
+    border: 1px solid var(--danger-border);
+    border-radius: var(--radius-md);
+}
+
+.submit {
+    margin-top: var(--space-2);
+    padding: var(--space-3) var(--space-5);
+    font-size: var(--text-base);
+    font-weight: 600;
+    background: var(--accent);
+    color: var(--text-on-accent);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.submit:hover:not(:disabled) {
+    background: var(--accent-hover);
+}
+
+.submit:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+.submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.switch {
+    margin: 0;
+    text-align: center;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+}
+
+.linkButton {
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: inherit;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.linkButton:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}

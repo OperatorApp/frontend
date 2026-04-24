@@ -1,65 +1,241 @@
+/* =========================================================
+   conversationPanel.module.css — left-side thread list
+   ========================================================= */
 
-.panel{
+.panel {
     display: flex;
     flex-direction: column;
-    width: 33vw;
+    width: 17rem;
+    flex-shrink: 0;
     height: 100vh;
+    background: var(--surface-2);
+    border-right: 1px solid var(--border);
     overflow: hidden;
 }
 
-.conversationContent{
-    background: cornflowerblue;
+/* ── Header ─────────────────────────────── */
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-5) var(--space-5) var(--space-4);
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+}
+
+.filterToggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.filterToggle:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* ── Filter panel ───────────────────────── */
+
+.filterPanel {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.filterInput {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text);
+    transition: border-color var(--transition-fast);
+}
+
+.filterInput::placeholder {
+    color: var(--text-subtle);
+}
+
+.filterInput:focus {
+    border-color: var(--accent);
+    outline: none;
+}
+
+.filterRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+}
+
+.filterRow label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    cursor: pointer;
+    user-select: none;
+}
+
+.filterRow input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+.filterSelect {
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--text-sm);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text);
+    cursor: pointer;
+}
+
+.filterSelect:focus {
+    border-color: var(--accent);
+    outline: none;
+}
+
+/* ── Thread list ────────────────────────── */
+
+.conversationContent {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3);
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
 }
 
-.user{
+.user,
+.userPending {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 0.75rem 1rem;
-    border-radius: 10px;
-    background: darkolivegreen;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border-radius: var(--radius-lg);
+    border: 1px solid transparent;
+    background: var(--surface);
     cursor: pointer;
-    border: none;
     text-align: left;
     width: 100%;
     flex-shrink: 0;
+    transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+    position: relative;
 }
 
-.userPending{
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.75rem 1rem;
-    border-radius: 10px;
-    background: lightcoral;
-    cursor: pointer;
-    border: none;
-    text-align: left;
-    width: 100%;
+.user:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+}
+
+/* Pending: warm sand background with left accent stripe */
+.userPending {
+    background: var(--warn-bg);
+    border-color: var(--warn-border);
+}
+
+.userPending::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: var(--space-2);
+    bottom: var(--space-2);
+    width: 3px;
+    border-radius: var(--radius-full);
+    background: var(--warn);
+}
+
+.userPending:hover {
+    background: var(--warn-bg);
+    filter: brightness(0.97);
+}
+
+.user img,
+.userPending img {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    background: var(--surface-3);
     flex-shrink: 0;
 }
 
-.user:hover, .userPending:hover{
-    opacity: 0.9;
-}
-
-.userText{
+.userText {
     flex: 1;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
 }
 
-.userText h3{
+.userText h3 {
+    font-family: var(--font-body);
     margin: 0;
-    font-size: 1rem;
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    letter-spacing: 0;
 }
 
+.userStatus {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.userPending .userStatus {
+    color: var(--warn);
+}
+
+.emptyState {
+    padding: var(--space-6);
+    color: var(--text-muted);
+    text-align: center;
+    font-size: var(--text-sm);
+}
+
+/* ── Responsive ─────────────────────────── */
+
+@media (max-width: 900px) {
+    .panel {
+        width: 100%;
+        height: auto;
+        max-height: 50vh;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+}

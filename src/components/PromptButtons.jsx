@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { usePromptButtons } from "../hooks/useAiPromptButtons.js";
+import styles from "../style/settings.module.css";
 
 function AddButtonModal({ onClose, onSubmit }) {
     const [name, setName] = useState("");
@@ -25,8 +26,8 @@ function AddButtonModal({ onClose, onSubmit }) {
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={e => e.stopPropagation()}>
+        <div className={styles.modalOverlay} onClick={onClose}>
+            <div className={styles.modal} onClick={e => e.stopPropagation()}>
                 <h3>Add Prompt Button</h3>
 
                 <label>Name</label>
@@ -45,11 +46,11 @@ function AddButtonModal({ onClose, onSubmit }) {
                     rows={4}
                 />
 
-                {error && <p className="error-text">{error}</p>}
+                {error && <p className={styles.errorText}>{error}</p>}
 
-                <div className="modal-actions">
-                    <button onClick={onClose} className="btn-secondary">Cancel</button>
-                    <button onClick={handleSubmit} disabled={submitting} className="btn-primary">
+                <div className={styles.modalActions}>
+                    <button onClick={onClose} className={styles.btnSecondary}>Cancel</button>
+                    <button onClick={handleSubmit} disabled={submitting} className={styles.btnPrimary}>
                         {submitting ? "Adding..." : "Add"}
                     </button>
                 </div>
@@ -63,20 +64,22 @@ function PromptButtons() {
     const [showModal, setShowModal] = useState(false);
 
     return (
-        <div className="settings-section">
-            <h3>Prompt Buttons</h3>
-            <p>Quick-access buttons that appear in the chat interface.</p>
+        <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Prompt Buttons</h3>
+            <p className={styles.sectionDescription}>
+                Quick-access buttons that appear in the chat interface.
+            </p>
 
-            {loading && <p>Loading...</p>}
-            {error && <p className="error-text">{error}</p>}
+            {loading && <p className={styles.sectionDescription}>Loading...</p>}
+            {error && <p className={styles.errorText}>{error}</p>}
 
-            <div className="prompt-buttons-list">
+            <div className={styles.promptList}>
                 {buttons.map(btn => (
-                    <div key={btn.id} className="prompt-button-row">
-                        <span className="prompt-button-name">{btn.name}</span>
+                    <div key={btn.id} className={styles.promptRow}>
+                        <span className={styles.promptName}>{btn.name}</span>
                         <button
                             onClick={() => removeButton(btn.id)}
-                            className="btn-danger"
+                            className={styles.btnDanger}
                         >
                             Remove
                         </button>
@@ -84,7 +87,7 @@ function PromptButtons() {
                 ))}
             </div>
 
-            <button onClick={() => setShowModal(true)} className="btn-primary">
+            <button onClick={() => setShowModal(true)} className={styles.btnPrimary}>
                 + Add Button
             </button>
 

@@ -33,8 +33,8 @@ function ConversationPanel({ setSelectedThreadId, selectedThreadId }) {
         setFilters(prev => ({ ...prev, [key]: value }))
     }
 
-    if (loading) return <div className={styles.panel}>Loading...</div>
-    if (error) return <div className={styles.panel}>Error loading threads</div>
+    if (loading) return <div className={styles.panel}><div className={styles.emptyState}>Loading...</div></div>
+    if (error) return <div className={styles.panel}><div className={styles.emptyState}>Error loading threads</div></div>
 
     return (
         <div className={styles.panel}>
@@ -44,7 +44,7 @@ function ConversationPanel({ setSelectedThreadId, selectedThreadId }) {
                     className={styles.filterToggle}
                     onClick={() => setFiltersOpen(prev => !prev)}
                 >
-                    <SlidersHorizontal size={18} />
+                    <SlidersHorizontal size={16} />
                 </button>
             </div>
 
@@ -95,7 +95,7 @@ function ConversationPanel({ setSelectedThreadId, selectedThreadId }) {
                         />
                     ))
                 ) : (
-                    <div style={{ padding: "20px", color: "#fff" }}>No threads available</div>
+                    <div className={styles.emptyState}>No threads available</div>
                 )}
             </div>
         </div>
@@ -106,10 +106,10 @@ function User({ threadId, name, onSelect, status, selectedThreadId }) {
     const isPending = status === "PENDING" && threadId !== selectedThreadId
     return (
         <button onClick={() => onSelect(threadId)} className={isPending ? styles.userPending : styles.user}>
-            <img src={icon} alt="user avatar" width={50} height={50} />
+            <img src={icon} alt="user avatar" />
             <div className={styles.userText}>
                 <h3>{name}</h3>
-                <span style={{ fontSize: "0.75rem", color: "#999" }}>{status || "OPEN"}</span>
+                <span className={styles.userStatus}>{status || "OPEN"}</span>
             </div>
         </button>
     )
