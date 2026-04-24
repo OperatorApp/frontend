@@ -1,0 +1,24 @@
+/* =========================================================
+   appLayout.module.css — top-level 3-pane layout
+   Wrap ConversationPanel + ThreadContextPanel in a div with
+   className={styles.layout} and data-view={selectedThreadId ? 'thread' : 'list'}
+   ========================================================= */
+
+.layout {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* On phones: single-pane navigation */
+@media (max-width: 720px) {
+    /* No thread selected → hide the thread/context area */
+    .layout[data-view="list"] > *:nth-child(2) {
+        display: none;
+    }
+
+    /* Thread selected → hide the conversation list */
+    .layout[data-view="thread"] > *:nth-child(1) {
+        display: none;
+    }
+}

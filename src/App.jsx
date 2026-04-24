@@ -6,22 +6,28 @@ import { RegisterForm } from "./components/RegisterForm"
 import { MessageProvider } from "./context/MessageContext.jsx"
 import { AuthProvider, useAuth } from "./context/AuthContext.jsx"
 import { useState } from "react"
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom"
+import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { Settings } from "./components/settings.jsx"
+import layout from './style/appLayout.module.css'
 
 function MainApp() {
     const [selectedThreadId, setSelectedThreadId] = useState(null)
-    const navigate = useNavigate()
 
     return (
         <MessageProvider>
-            <div className="settings-button-container">
-                <button onClick={() => navigate('/settings')} className="btn-settings">
-                    Settings
-                </button>
+            <div
+                className={layout.layout}
+                data-view={selectedThreadId ? 'thread' : 'list'}
+            >
+                <ConversationPanel
+                    setSelectedThreadId={setSelectedThreadId}
+                    selectedThreadId={selectedThreadId}
+                />
+                <ThreadContextPanel
+                    selectedThreadId={selectedThreadId}
+                    onBack={() => setSelectedThreadId(null)}
+                />
             </div>
-            <ConversationPanel setSelectedThreadId={setSelectedThreadId} selectedThreadId={selectedThreadId} />
-            <ThreadContextPanel selectedThreadId={selectedThreadId} />
         </MessageProvider>
     )
 }
@@ -38,14 +44,10 @@ function AuthenticatedApp() {
 function UnauthenticatedApp() {
     const [showLogin, setShowLogin] = useState(true)
 
-    return (
-        <div className="auth-container">
-            {showLogin ? (
-                <LoginForm onSwitchToRegister={() => setShowLogin(false)} />
-            ) : (
-                <RegisterForm onSwitchToLogin={() => setShowLogin(true)} />
-            )}
-        </div>
+    return showLogin ? (
+        <LoginForm onSwitchToRegister={() => setShowLogin(false)} />
+    ) : (
+        <RegisterForm onSwitchToLogin={() => setShowLogin(true)} />
     )
 }
 

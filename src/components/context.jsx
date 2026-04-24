@@ -1,7 +1,8 @@
 import { useState } from "react"
 import styles from "../style/context.module.css"
-import {usePromptButtons} from "../hooks/useAiPromptButtons.js";
-import {firePromptButton} from "../service/aiPromptButtonsService.js";
+import { usePromptButtons } from "../hooks/useAiPromptButtons.js";
+import { firePromptButton } from "../service/aiPromptButtonsService.js";
+import { X } from "lucide-react"
 
 function formatDisplayValue(value) {
     if (value == null) return ""
@@ -30,14 +31,29 @@ function formatUrlTrailEntry(entry) {
     return { text: formatDisplayValue(entry), timestamp: null }
 }
 
-function ContextPanel({ snapshot, threadId, onResponse }) {
+function ContextPanel({ snapshot, threadId, onResponse, isOpen, onClose }) {
     const [tab, setTab] = useState("context")
 
-
-    if (!snapshot) return (<div className={styles.empty}>No context found</div>)
+    if (!snapshot) {
+        return (
+            <div className={styles.panel} data-open={isOpen ? "true" : undefined}>
+                {onClose && (
+                    <button className={styles.closeBtn} onClick={onClose} aria-label="Close context">
+                        <X size={18} />
+                    </button>
+                )}
+                <div className={styles.empty}>No context found</div>
+            </div>
+        )
+    }
 
     return (
-        <div className={styles.panel}>
+        <div className={styles.panel} data-open={isOpen ? "true" : undefined}>
+            {onClose && (
+                <button className={styles.closeBtn} onClick={onClose} aria-label="Close context">
+                    <X size={18} />
+                </button>
+            )}
             <div className={styles.tabs}>
                 <TabBtn label="Context"       active={tab === "context"} onClick={() => setTab("context")} />
                 <TabBtn label="Quick Actions" active={tab === "actions"} onClick={() => setTab("actions")} />
@@ -82,11 +98,11 @@ function ContextTab({ context }) {
                         const { text, timestamp } = formatUrlTrailEntry(entry)
 
                         return (
-                        <div key={i} className={styles.urlItem}>
-                            <span className={styles.urlIndex}>{i + 1}</span>
-                            <span className={styles.urlText}>{text}</span>
-                            {timestamp && <span className={styles.urlTimestamp}>{timestamp}</span>}
-                        </div>
+                            <div key={i} className={styles.urlItem}>
+                                <span className={styles.urlIndex}>{i + 1}</span>
+                                <span className={styles.urlText}>{text}</span>
+                                {timestamp && <span className={styles.urlTimestamp}>{timestamp}</span>}
+                            </div>
                         )
                     })}
                 </Section>

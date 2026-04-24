@@ -30,7 +30,8 @@
     flex-shrink: 0;
 }
 
-.filterToggle {
+.filterToggle,
+.iconBtn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -45,10 +46,17 @@
     transition: all var(--transition-fast);
 }
 
-.filterToggle:hover {
+.filterToggle:hover,
+.iconBtn:hover {
     background: var(--accent-soft);
     border-color: var(--accent);
     color: var(--accent);
+}
+
+.headerActions {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
 }
 
 /* ── Filter panel ───────────────────────── */
@@ -230,12 +238,11 @@
 
 /* ── Responsive ─────────────────────────── */
 
-@media (max-width: 900px) {
+@media (max-width: 720px) {
     .panel {
         width: 100%;
-        height: auto;
-        max-height: 50vh;
+        max-height: none;
+        height: 100vh;
         border-right: none;
-        border-bottom: 1px solid var(--border);
     }
 }

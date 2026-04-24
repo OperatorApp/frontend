@@ -1,11 +1,13 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import styles from "../style/conversationPanel.module.css"
 import icon from "../assets/icon.png"
 import { useThreads } from "../hooks/useThreads.js"
 import { getThreadById, patchThreadStatusOPEN } from "../service/threadService.jsx"
-import { SlidersHorizontal } from "lucide-react"
+import { SlidersHorizontal, Settings as SettingsIcon } from "lucide-react"
 
 function ConversationPanel({ setSelectedThreadId, selectedThreadId }) {
+    const navigate = useNavigate()
     const [filtersOpen, setFiltersOpen] = useState(false)
     const [filters, setFilters] = useState({
         name: "",
@@ -40,12 +42,22 @@ function ConversationPanel({ setSelectedThreadId, selectedThreadId }) {
         <div className={styles.panel}>
             <div className={styles.header}>
                 <span>Conversations</span>
-                <button
-                    className={styles.filterToggle}
-                    onClick={() => setFiltersOpen(prev => !prev)}
-                >
-                    <SlidersHorizontal size={16} />
-                </button>
+                <div className={styles.headerActions}>
+                    <button
+                        className={styles.iconBtn}
+                        onClick={() => setFiltersOpen(prev => !prev)}
+                        aria-label="Toggle filters"
+                    >
+                        <SlidersHorizontal size={16} />
+                    </button>
+                    <button
+                        className={styles.iconBtn}
+                        onClick={() => navigate('/settings')}
+                        aria-label="Settings"
+                    >
+                        <SettingsIcon size={16} />
+                    </button>
+                </div>
             </div>
 
             {filtersOpen && (

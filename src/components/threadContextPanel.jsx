@@ -4,10 +4,12 @@ import { ContextPanel } from "./context.jsx"
 import { useThread } from "../hooks/useThread.js"
 import { useScrollBottom } from "../hooks/useScrollBottom.js";
 import { useAiSuggestion } from "../hooks/useAiSugesstion.js";
+import { ArrowLeft, Info } from "lucide-react"
 
-function ThreadContextPanel({ selectedThreadId }) {
+function ThreadContextPanel({ selectedThreadId, onBack }) {
     const { thread, loading, error, send } = useThread(selectedThreadId)
     const [text, setText] = useState("")
+    const [contextOpen, setContextOpen] = useState(false)
 
     return (
         <div className={styles.threadContext}>
@@ -19,17 +21,27 @@ function ThreadContextPanel({ selectedThreadId }) {
                 selectedThreadId={selectedThreadId}
                 text={text}
                 setText={setText}
+                onBack={onBack}
+                onToggleContext={() => setContextOpen(o => !o)}
             />
             <ContextPanel
                 snapshot={thread?.snapshot}
                 threadId={selectedThreadId}
                 onResponse={(response) => setText(response)}
+                isOpen={contextOpen}
+                onClose={() => setContextOpen(false)}
             />
+            {contextOpen && (
+                <div
+                    className={styles.contextBackdrop}
+                    onClick={() => setContextOpen(false)}
+                />
+            )}
         </div>
     )
 }
 
-function Thread({ thread, loading, error, send, selectedThreadId, text, setText }) {
+function Thread({ thread, loading, error, send, selectedThreadId, text, setText, onBack, onToggleContext }) {
     const scrollRef = useScrollBottom(thread?.messages)
     const { suggestion, loading: aiLoading, suggest, clear } = useAiSuggestion()
 
@@ -54,13 +66,37 @@ function Thread({ thread, loading, error, send, selectedThreadId, text, setText 
         clear()
     }
 
-    if (loading) return <div className={styles.thread}><div className={styles.emptyMessages}>Loading...</div></div>
-    if (error) return <div className={styles.thread}><div className={styles.emptyMessages}>Error loading thread</div></div>
-    if (!thread) return <div className={styles.thread}><div className={styles.emptyMessages}>Select a conversation to begin</div></div>
+    const header = (
+        <div className={styles.threadHeader}>
+            {onBack && (
+                <button
+                    className={styles.backBtn}
+                    onClick={onBack}
+                    aria-label="Back to conversations"
+                >
+                    <ArrowLeft size={18} />
+                </button>
+            )}
+            <span className={styles.threadTitle}>Thread</span>
+            {onToggleContext && (
+                <button
+                    className={styles.contextToggle}
+                    onClick={onToggleContext}
+                    aria-label="Toggle context"
+                >
+                    <Info size={18} />
+                </button>
+            )}
+        </div>
+    )
+
+    if (loading) return <div className={styles.thread}>{header}<div className={styles.emptyMessages}>Loading...</div></div>
+    if (error) return <div className={styles.thread}>{header}<div className={styles.emptyMessages}>Error loading thread</div></div>
+    if (!thread) return <div className={styles.thread}>{header}<div className={styles.emptyMessages}>Select a conversation to begin</div></div>
 
     return (
         <div className={styles.thread}>
-            <div className={styles.threadHeader}>Thread</div>
+            {header}
             <div className={styles.messages} ref={scrollRef}>
                 {thread.messages && thread.messages.length > 0 ? (
                     thread.messages.map(message => (
