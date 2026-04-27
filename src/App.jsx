@@ -10,6 +10,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { Settings } from "./components/settings.jsx"
 import layout from './style/appLayout.module.css'
 
+
 function MainApp() {
     const [selectedThreadId, setSelectedThreadId] = useState(null)
 
