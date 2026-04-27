@@ -1,16 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { authService } from "../service/authService.js";
-import {PromptButtons} from "./PromptButtons.jsx";
+import { operatorService } from "../service/operatorService.js";
+import { PromptButtons } from "./PromptButtons.jsx";
 
 function Settings() {
     const navigate = useNavigate();
     const { logout } = useAuth();
+
     const [apiKey, setApiKey] = useState(null);
     const [loading, setLoading] = useState(false);
     const [copied, setCopied] = useState(false);
     const [error, setError] = useState(null);
+
+    const [languages, setLanguages] = useState([]);
+    const [newLanguage, setNewLanguage] = useState("");
+    const [langLoading, setLangLoading] = useState(false);
+    const [langError, setLangError] = useState(null);
+
+    useEffect(() => {
+        const fetchLanguages = async () => {
+            try {
+                const res = await operatorService.getLanguagesSer();
+                // Backend returns { success: true, data: languages }
+                // Adjust if your backend service returns an object instead of a plain array
+                const list = Array.isArray(res?.data) ? res.data : (res?.data?.languages || []);
+                setLanguages(list);
+            } catch (err) {
+                setLangError(err.message || "Failed to fetch languages");
+            }
+        };
+        fetchLanguages();
+    }, []);
 
     const handleGenerateApiKey = async () => {
         setLoading(true);
@@ -30,6 +52,49 @@ function Settings() {
         navigator.clipboard.writeText(apiKey);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+    };
+
+    const handleAddLanguage = async () => {
+        const trimmed = newLanguage.trim();
+        if (!trimmed) return;
+        if (languages.includes(trimmed)) {
+            setLangError("Language already added");
+            return;
+        }
+
+        const updated = [...languages, trimmed];
+        setLangLoading(true);
+        setLangError(null);
+        try {
+            await operatorService.updateLanguageSer(updated);
+            setLanguages(updated);
+            setNewLanguage("");
+        } catch (err) {
+            setLangError(err.message || "Failed to add language");
+        } finally {
+            setLangLoading(false);
+        }
+    };
+
+    const handleDeleteLanguage = async (lang) => {
+        const updated = languages.filter(l => l !== lang);
+        setLangLoading(true);
+        setLangError(null);
+        try {
+            await operatorService.updateLanguageSer(updated);
+            setLanguages(updated);
+        } catch (err) {
+            setLangError(err.message || "Failed to delete language");
+        } finally {
+            setLangLoading(false);
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            handleAddLanguage();
+        }
     };
 
     return (
@@ -66,6 +131,50 @@ function Settings() {
                     <p className="warning-text">
                         Store this key securely — it won't be shown again after you leave this page.
                     </p>
+                )}
+            </div>
+
+            <div className="settings-section">
+                <h3>Languages</h3>
+                <p>Manage the languages you support.</p>
+
+                <div className="language-add">
+                    <input
+                        type="text"
+                        value={newLanguage}
+                        onChange={(e) => setNewLanguage(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder="e.g. English"
+                        disabled={langLoading}
+                    />
+                    <button
+                        onClick={handleAddLanguage}
+                        disabled={langLoading || !newLanguage.trim()}
+                        className="btn-primary"
+                    >
+                        Add
+                    </button>
+                </div>
+
+                {langError && <p className="error-text">{langError}</p>}
+
+                {languages.length === 0 ? (
+                    <p className="muted-text">No languages added yet.</p>
+                ) : (
+                    <ul className="language-list">
+                        {languages.map((lang) => (
+                            <li key={lang} className="language-item">
+                                <span>{lang}</span>
+                                <button
+                                    onClick={() => handleDeleteLanguage(lang)}
+                                    disabled={langLoading}
+                                    className="btn-danger-small"
+                                >
+                                    Delete
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
                 )}
             </div>
 

@@ -81,6 +81,24 @@ export const authService = {
         return apiKey
     },
 
+    async changeOperatorLanguages(languages) {
+        const token = authService.getToken()
+        const response = await fetch(`${API_URL}/auth/update-language`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`},
+            body: JSON.stringify({ languages })
+        })
+        const data = await response.json()
+
+        if (!response.ok || data?.success === false) {
+            throw new Error(data?.message || data?.error || 'Failed to update languages')
+        }
+
+        return data
+    },
+
 
     async refreshToken() {
         const response = await fetch(`${API_URL}/auth/refresh`, {
