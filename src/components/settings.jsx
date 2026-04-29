@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { authService } from "../service/authService.js";
 import { operatorService } from "../service/operatorService.js";
+import { upsertKnowledge } from "../service/aiSuggestionService.js";
 import { PromptButtons } from "./PromptButtons.jsx";
 
 function Settings() {
@@ -19,12 +20,15 @@ function Settings() {
     const [langLoading, setLangLoading] = useState(false);
     const [langError, setLangError] = useState(null);
 
+    const [knowledge, setKnowledge] = useState("");
+    const [knowledgeLoading, setKnowledgeLoading] = useState(false);
+    const [knowledgeError, setKnowledgeError] = useState(null);
+    const [knowledgeSaved, setKnowledgeSaved] = useState(false);
+
     useEffect(() => {
         const fetchLanguages = async () => {
             try {
                 const res = await operatorService.getLanguagesSer();
-                // Backend returns { success: true, data: languages }
-                // Adjust if your backend service returns an object instead of a plain array
                 const list = Array.isArray(res?.data) ? res.data : (res?.data?.languages || []);
                 setLanguages(list);
             } catch (err) {
@@ -94,6 +98,22 @@ function Settings() {
         if (e.key === "Enter") {
             e.preventDefault();
             handleAddLanguage();
+        }
+    };
+
+    const handleSaveKnowledge = async () => {
+        if (!knowledge.trim()) return;
+        setKnowledgeLoading(true);
+        setKnowledgeError(null);
+        setKnowledgeSaved(false);
+        try {
+            await upsertKnowledge(knowledge);
+            setKnowledgeSaved(true);
+            setTimeout(() => setKnowledgeSaved(false), 2500);
+        } catch (err) {
+            setKnowledgeError(err.message || "Failed to save knowledge");
+        } finally {
+            setKnowledgeLoading(false);
         }
     };
 
@@ -176,6 +196,30 @@ function Settings() {
                         ))}
                     </ul>
                 )}
+            </div>
+
+            <div className="settings-section">
+                <h3>Knowledge Base</h3>
+                <p>Provide content the AI can reference when generating suggestions. Saving replaces the previous knowledge entry.</p>
+
+                <textarea
+                    value={knowledge}
+                    onChange={(e) => setKnowledge(e.target.value)}
+                    placeholder="Paste or type your knowledge base content here..."
+                    disabled={knowledgeLoading}
+                    rows={10}
+                    className="knowledge-textarea"
+                />
+
+                {knowledgeError && <p className="error-text">{knowledgeError}</p>}
+
+                <button
+                    onClick={handleSaveKnowledge}
+                    disabled={knowledgeLoading || !knowledge.trim()}
+                    className="btn-primary"
+                >
+                    {knowledgeLoading ? "Saving..." : knowledgeSaved ? "Saved!" : "Save Knowledge"}
+                </button>
             </div>
 
             <PromptButtons />

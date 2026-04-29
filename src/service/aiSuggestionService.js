@@ -20,4 +20,22 @@ async function getAiSuggestion(prompt, threadId) {
     return data.response
 }
 
-export { getAiSuggestion }
+
+async function upsertKnowledge(content) {
+    const token = authService.getToken()
+
+    const response = await fetch(`${BASE_URL}/ai/knowledge`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ content })
+    })
+
+    const data = await response.json()
+    if (!data.success) throw new Error(data.error)
+    return data.data
+}
+
+export { getAiSuggestion, upsertKnowledge }

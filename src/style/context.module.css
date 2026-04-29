@@ -70,6 +70,7 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     padding: var(--space-4);
+    transition: background-color 400ms ease;
 }
 
 .sectionTitle {

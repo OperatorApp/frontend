@@ -1,7 +1,7 @@
 import { useState } from "react"
 import styles from "../style/context.module.css"
-import { usePromptButtons } from "../hooks/useAiPromptButtons.js";
-import { firePromptButton } from "../service/aiPromptButtonsService.js";
+import { usePromptButtons } from "../hooks/useAiPromptButtons.js"
+import { firePromptButton } from "../service/aiPromptButtonsService.js"
 import { X } from "lucide-react"
 
 function formatDisplayValue(value) {
@@ -20,18 +20,136 @@ function formatUrlTrailEntry(entry) {
     if (typeof entry === "string") {
         return { text: entry, timestamp: null }
     }
-
     if (entry && typeof entry === "object") {
         return {
             text: formatDisplayValue(entry.url) || formatDisplayValue(entry),
             timestamp: entry.ts ? formatDisplayValue(entry.ts) : null,
         }
     }
-
     return { text: formatDisplayValue(entry), timestamp: null }
 }
 
-function ContextPanel({ snapshot, threadId, onResponse, isOpen, onClose }) {
+// ─── Section catalog ───────────────────────────────────────
+// One entry per section type. `id` must match the backend's
+// section IDs so paint scores line up. Adding a section means
+// adding one entry here and nothing else.
+
+const SECTIONS = [
+    {
+        id: "customer",
+        title: "Customer",
+        isVisible: (ctx) => !!ctx?.customer,
+        render: (ctx) => {
+            const { customer } = ctx
+            return (
+                <>
+                    {customer.name && <Row label="Name" value={customer.name} />}
+                    {customer.email && <Row label="Email" value={customer.email} />}
+                    {customer.lang && <Row label="Lang" value={customer.lang.toUpperCase()} />}
+                </>
+            )
+        },
+    },
+    {
+        id: "session",
+        title: "Session",
+        isVisible: (ctx) =>
+            !!(ctx?.country || ctx?.city || ctx?.local_time || ctx?.cart_snapshot?.currency || ctx?.sentiment_label),
+        render: (ctx) => {
+            const { country, city, local_time, cart_snapshot, sentiment_label, sentiment_conf } = ctx
+            return (
+                <>
+                    {(city || country) && (
+                        <Row label="Location" value={[city, country].filter(Boolean).join(", ")} />
+                    )}
+                    {local_time && <Row label="Local time" value={local_time} />}
+                    {cart_snapshot?.currency && <Row label="Currency" value={cart_snapshot.currency} />}
+                    {sentiment_label && (
+                        <Row
+                            label="Sentiment"
+                            value={`${sentiment_label}${sentiment_conf ? ` (${Math.round(sentiment_conf * 100)}%)` : ""}`}
+                        />
+                    )}
+                </>
+            )
+        },
+    },
+    {
+        id: "url_trail",
+        title: "URL Trail",
+        isVisible: (ctx) => ctx?.url_trail?.length > 0,
+        render: (ctx) => (
+            <>
+                {ctx.url_trail.map((entry, i) => {
+                    const { text, timestamp } = formatUrlTrailEntry(entry)
+                    return (
+                        <div key={i} className={styles.urlItem}>
+                            <span className={styles.urlIndex}>{i + 1}</span>
+                            <span className={styles.urlText}>{text}</span>
+                            {timestamp && <span className={styles.urlTimestamp}>{timestamp}</span>}
+                        </div>
+                    )
+                })}
+            </>
+        ),
+    },
+    {
+        id: "cart",
+        title: "Cart",
+        isVisible: (ctx) => !!ctx?.cart_snapshot,
+        render: (ctx) => {
+            const cart = ctx.cart_snapshot
+            if (!cart.items?.length) return <span className={styles.muted}>Empty</span>
+            return (
+                <>
+                    {cart.items.map((item, i) => (
+                        <Row
+                            key={i}
+                            label={item.name}
+                            value={`${cart.currency || ""} ${item.price?.toFixed(2) || ""}`}
+                        />
+                    ))}
+                    {cart.total != null && (
+                        <div className={styles.cartTotal}>
+                            <Row label="Total" value={`${cart.currency || ""} ${cart.total.toFixed(2)}`} />
+                        </div>
+                    )}
+                </>
+            )
+        },
+    },
+    {
+        id: "orders",
+        title: "Orders",
+        isVisible: (ctx) => ctx?.orders?.length > 0,
+        render: (ctx) => (
+            <>
+                {ctx.orders.map(order => (
+                    <div key={order.id} className={styles.orderBlock}>
+                        <Row label={order.id} value={order.status} />
+                        {order.shipments?.map((shp, i) => (
+                            <div key={i} className={styles.shipment}>
+                                {[shp.carrier, shp.tracking_no, shp.last_status].filter(Boolean).join(" · ")}
+                            </div>
+                        ))}
+                    </div>
+                ))}
+            </>
+        ),
+    },
+]
+
+// ─── Panel ──────────────────────────────────────────────────
+
+function ContextPanel({
+                          snapshot,
+                          threadId,
+                          onResponse,
+                          isOpen,
+                          onClose,
+                          getSectionColor,
+                          getSectionScore,
+                      }) {
     const [tab, setTab] = useState("context")
 
     if (!snapshot) {
@@ -59,104 +177,64 @@ function ContextPanel({ snapshot, threadId, onResponse, isOpen, onClose }) {
                 <TabBtn label="Quick Actions" active={tab === "actions"} onClick={() => setTab("actions")} />
             </div>
             <div className={styles.content}>
-                {tab === "context" ? <ContextTab context={snapshot} /> : <ActionsTab context={snapshot} threadId={threadId} onResponse={onResponse}/>}
+                {tab === "context" ? (
+                    <ContextTab
+                        context={snapshot}
+                        getSectionColor={getSectionColor}
+                        getSectionScore={getSectionScore}
+                    />
+                ) : (
+                    <ActionsTab
+                        context={snapshot}
+                        threadId={threadId}
+                        onResponse={onResponse}
+                    />
+                )}
             </div>
         </div>
     )
 }
 
-function ContextTab({ context }) {
-    const { customer, country, city, local_time, url_trail, cart_snapshot, sentiment_label, sentiment_conf, orders } = context || {}
+// ─── Context tab ────────────────────────────────────────────
+
+function ContextTab({ context, getSectionColor, getSectionScore }) {
+    if (!context) return null
+
+    const visible = SECTIONS.filter(s => s.isVisible(context))
+
+    const sorted = [...visible].sort((a, b) => {
+        const scoreA = getSectionScore?.(a.id) ?? 0
+        const scoreB = getSectionScore?.(b.id) ?? 0
+        if (scoreB !== scoreA) return scoreB - scoreA
+        return SECTIONS.indexOf(a) - SECTIONS.indexOf(b)
+    })
 
     return (
         <div className={styles.tabContent}>
-
-            {customer && (
-                <Section title="Customer">
-                    {customer.name && <Row label="Name" value={customer.name} />}
-                    {customer.email && <Row label="Email" value={customer.email} />}
-                    {customer.lang && <Row label="Lang" value={customer.lang.toUpperCase()} />}
+            {sorted.map(section => (
+                <Section
+                    key={section.id}
+                    id={section.id}
+                    title={section.title}
+                    getSectionColor={getSectionColor}
+                    getSectionScore={getSectionScore}
+                >
+                    {section.render(context)}
                 </Section>
-            )}
-
-            {(country || city || local_time || cart_snapshot?.currency || sentiment_label) && (
-                <Section title="Session">
-                    {(city || country) && (
-                        <Row label="Location" value={[city, country].filter(Boolean).join(", ")} />
-                    )}
-                    {local_time && <Row label="Local time" value={local_time} />}
-                    {cart_snapshot?.currency && <Row label="Currency" value={cart_snapshot.currency} />}
-                    {sentiment_label && (
-                        <Row label="Sentiment" value={`${sentiment_label}${sentiment_conf ? ` (${Math.round(sentiment_conf * 100)}%)` : ""}`} />
-                    )}
-                </Section>
-            )}
-
-            {url_trail?.length > 0 && (
-                <Section title="URL Trail">
-                    {url_trail.map((entry, i) => {
-                        const { text, timestamp } = formatUrlTrailEntry(entry)
-
-                        return (
-                            <div key={i} className={styles.urlItem}>
-                                <span className={styles.urlIndex}>{i + 1}</span>
-                                <span className={styles.urlText}>{text}</span>
-                                {timestamp && <span className={styles.urlTimestamp}>{timestamp}</span>}
-                            </div>
-                        )
-                    })}
-                </Section>
-            )}
-
-            {cart_snapshot && (
-                <Section title="Cart">
-                    {!cart_snapshot.items?.length
-                        ? <span className={styles.muted}>Empty</span>
-                        : <>
-                            {cart_snapshot.items.map((item, i) => (
-                                <Row key={i} label={item.name}
-                                     value={`${cart_snapshot.currency || ""} ${item.price?.toFixed(2) || ""}`} />
-                            ))}
-                            {cart_snapshot.total != null && (
-                                <div className={styles.cartTotal}>
-                                    <Row label="Total"
-                                         value={`${cart_snapshot.currency || ""} ${cart_snapshot.total.toFixed(2)}`} />
-                                </div>
-                            )}
-                        </>
-                    }
-                </Section>
-            )}
-
-            {orders?.length > 0 && (
-                <Section title="Orders">
-                    {orders.map(order => (
-                        <div key={order.id} className={styles.orderBlock}>
-                            <Row label={order.id} value={order.status} />
-                            {order.shipments?.map((shp, i) => (
-                                <div key={i} className={styles.shipment}>
-                                    {[shp.carrier, shp.tracking_no, shp.last_status].filter(Boolean).join(" · ")}
-                                </div>
-                            ))}
-                        </div>
-                    ))}
-                </Section>
-            )}
-
+            ))}
         </div>
     )
 }
 
+// ─── Actions tab ────────────────────────────────────────────
+
 function ActionsTab({ context, threadId, onResponse }) {
-    const { country, orders } = context || {}
-    const hasOrder = orders?.length > 0
     const { buttons, loading } = usePromptButtons()
     const [firingId, setFiringId] = useState(null)
 
     const handlePromptButton = async (btn) => {
         setFiringId(btn.id)
         try {
-            console.log("threadId in ActionsTab:", threadId)
             const result = await firePromptButton(btn.id, threadId)
             onResponse?.(result.response, result.thread_id)
         } catch (err) {
@@ -168,7 +246,6 @@ function ActionsTab({ context, threadId, onResponse }) {
 
     return (
         <div className={styles.tabContent}>
-
             {!loading && buttons.length > 0 && (
                 <Section title="Prompt Buttons">
                     {buttons.map(btn => (
@@ -181,14 +258,27 @@ function ActionsTab({ context, threadId, onResponse }) {
                     ))}
                 </Section>
             )}
-
         </div>
     )
 }
 
-function Section({ title, children }) {
+// ─── Primitives ─────────────────────────────────────────────
+
+function Section({ id, title, getSectionColor, getSectionScore, children }) {
+    const color = id ? getSectionColor?.(id) : null
+    const score = id ? getSectionScore?.(id) ?? 0 : null
+
+    const style = color
+        ? { backgroundColor: color, transition: "background-color 400ms ease" }
+        : undefined
+
     return (
-        <div className={styles.section}>
+        <div
+            className={styles.section}
+            style={style}
+            data-section-id={id}
+            data-score={score != null ? score.toFixed(2) : undefined}
+        >
             <div className={styles.sectionTitle}>{title}</div>
             <div className={styles.sectionBody}>{children}</div>
         </div>
@@ -218,7 +308,10 @@ function ActionBtn({ label, disabled = false, onClick }) {
 
 function TabBtn({ label, active, onClick }) {
     return (
-        <button className={`${styles.tabBtn} ${active ? styles.tabBtnActive : ""}`} onClick={onClick}>
+        <button
+            className={`${styles.tabBtn} ${active ? styles.tabBtnActive : ""}`}
+            onClick={onClick}
+        >
             {label}
         </button>
     )

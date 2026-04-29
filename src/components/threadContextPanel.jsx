@@ -5,9 +5,11 @@ import { useThread } from "../hooks/useThread.js"
 import { useScrollBottom } from "../hooks/useScrollBottom.js";
 import { useAiSuggestion } from "../hooks/useAiSugesstion.js";
 import { ArrowLeft, Info } from "lucide-react"
+import { usePaint } from "../hooks/usePaintState.js"
 
 function ThreadContextPanel({ selectedThreadId, onBack }) {
     const { thread, loading, error, send } = useThread(selectedThreadId)
+    const { getSectionColor, getSectionScore } = usePaint(selectedThreadId)
     const [text, setText] = useState("")
     const [contextOpen, setContextOpen] = useState(false)
 
@@ -30,13 +32,11 @@ function ThreadContextPanel({ selectedThreadId, onBack }) {
                 onResponse={(response) => setText(response)}
                 isOpen={contextOpen}
                 onClose={() => setContextOpen(false)}
+                getSectionColor={getSectionColor}
+                getSectionScore={getSectionScore}
             />
-            {contextOpen && (
-                <div
-                    className={styles.contextBackdrop}
-                    onClick={() => setContextOpen(false)}
-                />
-            )}
+            {contextOpen && <div className={styles.contextBackdrop} onClick={() => setContextOpen(false)} />}
+
         </div>
     )
 }

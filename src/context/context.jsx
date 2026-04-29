@@ -19,7 +19,7 @@ export function connectSocket() {
         return null
     }
 
-    socket = io(import.meta.env.VITE_API_URL, {
+    socket = io(import.meta.env.VITE_SOCKET_URL, {
         reconnectionDelayMax: 10000,
         auth: { token },
     })
