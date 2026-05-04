@@ -5,6 +5,7 @@ import icon from "../assets/icon.png"
 import { useThreads } from "../hooks/useThreads.js"
 import { getThreadById, patchThreadStatusOPEN } from "../service/threadService.jsx"
 import { SlidersHorizontal, Settings as SettingsIcon } from "lucide-react"
+import {ThreadColorIndicator} from "./ThreadColorIndicator.jsx";
 
 function ConversationPanel({ setSelectedThreadId, selectedThreadId }) {
     const navigate = useNavigate()
@@ -123,6 +124,7 @@ function User({ threadId, name, onSelect, status, selectedThreadId }) {
                 <h3>{name}</h3>
                 <span className={styles.userStatus}>{status || "OPEN"}</span>
             </div>
+            <ThreadColorIndicator threadId={threadId} />
         </button>
     )
 }
