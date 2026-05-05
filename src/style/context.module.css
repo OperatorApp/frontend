@@ -64,9 +64,10 @@
 
 .section {
     display: flex;
+    --section-color: transparent;
     flex-direction: column;
     gap: var(--space-3);
-    background: var(--surface-2);
+    background: color-mix(in srgb, var(--section-color, transparent) 30%, var(--surface-2));
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     padding: var(--space-4);

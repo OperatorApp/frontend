@@ -276,7 +276,7 @@ function Section({ id, title, getSectionColor, getSectionScore, children }) {
     const score = id ? getSectionScore?.(id) ?? 0 : null
 
     const style = color
-        ? { backgroundColor: color, transition: "background-color 400ms ease" }
+        ? { "--section-color": color, transition: "background-color 400ms ease" }
         : undefined
 
     return (
