@@ -1,4 +1,4 @@
-import './App.css'
+
 import { ConversationPanel } from "./components/conversationPanel"
 import { ThreadContextPanel } from "./components/threadContextPanel.jsx"
 import { LoginForm } from "./components/LoginForm"
