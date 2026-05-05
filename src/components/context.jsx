@@ -21,9 +21,16 @@ function formatUrlTrailEntry(entry) {
         return { text: entry, timestamp: null }
     }
     if (entry && typeof entry === "object") {
+        let timestamp = null
+        if (entry.ts) {
+            const d = new Date(entry.ts)
+            timestamp = isNaN(d)
+                ? formatDisplayValue(entry.ts)
+                : d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        }
         return {
             text: formatDisplayValue(entry.url) || formatDisplayValue(entry),
-            timestamp: entry.ts ? formatDisplayValue(entry.ts) : null,
+            timestamp,
         }
     }
     return { text: formatDisplayValue(entry), timestamp: null }
