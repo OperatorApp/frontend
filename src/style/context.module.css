@@ -287,6 +287,37 @@
     color: var(--text);
 }
 
+.cartItem {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-2) 0;
+    border-bottom: 1px dashed var(--border);
+    font-size: var(--text-sm);
+}
+
+.cartItem:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.cartItemName {
+    color: var(--text);
+    font-weight: 500;
+    line-height: var(--leading-tight);
+    overflow-wrap: anywhere; /* wrap long names cleanly without breaking mid-word unless needed */
+}
+
+.cartItemMeta {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;     /* prices never break char-by-char */
+}
+
 /* ── Responsive ─────────────────────────── */
 
 @media (max-width: 1100px) {

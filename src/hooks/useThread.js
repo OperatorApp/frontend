@@ -17,7 +17,8 @@ function appendMessage(thread, message, activeThreadId) {
 
     return {
         ...thread,
-        messages: [...messages, message]
+        messages: [...messages, message],
+        snapshot: message.snapshot ?? thread.snapshot,
     }
 }
 

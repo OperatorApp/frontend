@@ -107,18 +107,22 @@ const SECTIONS = [
         render: (ctx) => {
             const cart = ctx.cart_snapshot
             if (!cart.items?.length) return <span className={styles.muted}>Empty</span>
+            const fmtPrice = n => `${cart.currency || ""} ${Number(n ?? 0).toFixed(2)}`
+
             return (
                 <>
                     {cart.items.map((item, i) => (
-                        <Row
-                            key={i}
-                            label={item.name}
-                            value={`${cart.currency || ""} ${item.price?.toFixed(2) || ""}`}
-                        />
+                        <div key={i} className={styles.cartItem}>
+                            <div className={styles.cartItemName}>{item.name}</div>
+                            <div className={styles.cartItemMeta}>
+                                {item.qty > 1 && <span>×{item.qty}</span>}
+                                <span>{fmtPrice(item.price)}</span>
+                            </div>
+                        </div>
                     ))}
                     {cart.total != null && (
                         <div className={styles.cartTotal}>
-                            <Row label="Total" value={`${cart.currency || ""} ${cart.total.toFixed(2)}`} />
+                            <Row label="Total" value={fmtPrice(cart.total)} />
                         </div>
                     )}
                 </>
