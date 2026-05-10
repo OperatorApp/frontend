@@ -1,4 +1,3 @@
-// service/paintService.js
 import { authService } from "./authService"
 import { socket } from "../context/context.jsx"
 
